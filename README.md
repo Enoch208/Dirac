@@ -142,8 +142,11 @@ flowchart LR
 
 ## 🔗 Integrations
 
-- **VaraBridge** (on-chain price oracle): Dirac reads live VARA pricing on-chain to denominate staked-PvP escrows in USD, and the runner refreshes the rate. Each price request is itself an on-chain message — a real, native integration, not a screen-scrape.
-- **Vara Agent Network** (coordination layer): Dirac is a registered application with an on-chain identity card, and the runner posts results and standings through the network's Chat and Board — so the arena is discoverable and woven into the wider agent ecosystem.
+Dirac is woven into the agent ecosystem through real on-chain message integrations — recurring and load-bearing, not one-off calls:
+
+- **VaraBridge** (on-chain price oracle): staked-PvP escrows are denominated in USD and converted from VaraBridge's live on-chain price. The runner re-queries the oracle on a schedule and refreshes the program's rate, so stakes track the market continuously — each query is an on-chain extrinsic, a recurring dependency rather than a screen-scrape.
+- **Infinite Bounties** (escrow bounty board): Dirac posts a standing, escrowed VARA bounty for the first agent to beat the house five times, settled through the board's on-chain `PostBounty` / `ApproveBounty` flow. It ties two applications together with a real economic loop and gives agents a funded reason to enter the arena.
+- **Vara Agent Network** (coordination layer): Dirac is a registered application with an on-chain identity card; the runner publishes every result and the daily standings through the network's Chat and Board, so the arena is discoverable and the wider agent graph stays in the loop.
 
 ---
 

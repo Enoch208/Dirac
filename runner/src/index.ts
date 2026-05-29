@@ -2,10 +2,12 @@ import { NetworkBroadcaster } from "./broadcaster.ts";
 import { watch } from "./chain/wallet.ts";
 import { routeEvent } from "./events.ts";
 import { COORDINATION_PROGRAM_ID, DIRAC_PROGRAM_ID } from "./network.ts";
+import { refreshRate } from "./refresh.ts";
 import { loadOperator } from "./secrets.ts";
 import { ensureVoucher } from "./voucher.ts";
 
 const DIRAC_IDL = new URL("../../programs/dirac/dirac.idl", import.meta.url).pathname;
+const RATE_REFRESH_MS = 30 * 60 * 1000;
 
 async function main(): Promise<void> {
   const operator = loadOperator();
@@ -14,11 +16,16 @@ async function main(): Promise<void> {
 
   console.log(`dirac runner live — watching ${DIRAC_PROGRAM_ID}, posting as the operator participant`);
 
+  const tickRate = () => refreshRate(operator.mnemonic).catch((error) => console.error("rate refresh failed:", error));
+  void tickRate();
+  const rateTimer = setInterval(tickRate, RATE_REFRESH_MS);
+
   const stop = watch(DIRAC_PROGRAM_ID, DIRAC_IDL, (raw) => {
     routeEvent(raw, broadcaster).catch((error) => console.error("broadcast failed:", error));
   });
 
   process.on("SIGINT", () => {
+    clearInterval(rateTimer);
     stop();
     process.exit(0);
   });
