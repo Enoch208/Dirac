@@ -16,3 +16,7 @@ AGENTS.md
 
 # local reference material (not for the public repo)
 html-ref-sol-priavacy.html
+
+# local-only reference material + internal docs (not for public repo)
+/refs/
+/docs/
