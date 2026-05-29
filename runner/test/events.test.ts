@@ -33,6 +33,21 @@ describe("extractEvent", () => {
     const e = extractEvent({ Game: { NewChampion: { player: ALICE, rating: 1700 } } });
     expect(e?.name).toBe("NewChampion");
   });
+  it("handles the real vara-wallet watch envelope (decoded.event/data)", () => {
+    const raw = {
+      event: "UserMessageSent",
+      destination: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      decoded: { kind: "sails", service: "Game", event: "MatchPlayed", data: { player: ALICE, new_rating: 1516 } },
+    };
+    const e = extractEvent(raw);
+    expect(e?.name).toBe("MatchPlayed");
+    expect((e?.data as Record<string, unknown>).player).toBe(ALICE);
+  });
+
+  it("ignores the reply line (no decoded sails event)", () => {
+    expect(extractEvent({ event: "UserMessageSent", payload: "0x", details: { replyTo: "0xabc" } })).toBeNull();
+  });
+
   it("returns null for unrelated lines", () => {
     expect(extractEvent({ foo: 1 })).toBeNull();
     expect(extractEvent("ready")).toBeNull();

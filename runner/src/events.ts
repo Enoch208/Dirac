@@ -52,6 +52,16 @@ function scan(o: Data): { name: string; data: Data } | null {
 export function extractEvent(raw: unknown): { name: string; data: Data } | null {
   if (!raw || typeof raw !== "object") return null;
   const obj = raw as Data;
+
+  const decoded = obj.decoded as Data | undefined;
+  if (decoded && typeof decoded === "object") {
+    const decodedName = decoded.event as string | undefined;
+    const decodedData = decoded.data as Data | undefined;
+    if (typeof decodedName === "string" && EVENT_NAMES.includes(decodedName) && decodedData && typeof decodedData === "object") {
+      return { name: decodedName, data: decodedData };
+    }
+  }
+
   const name = (obj.name ?? obj.event ?? obj.method) as string | undefined;
   const payload = (obj.payload ?? obj.data ?? obj.args) as Data | undefined;
   if (typeof name === "string" && EVENT_NAMES.includes(name) && payload && typeof payload === "object") {
