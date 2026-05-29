@@ -36,11 +36,18 @@ function loadSdk(): Promise<UnicornStudioApi> {
     const script = document.createElement("script");
     script.src = NEBULA.sdkUrl;
     script.async = true;
-    script.onload = () =>
-      window.UnicornStudio
-        ? resolve(window.UnicornStudio)
-        : reject(new Error("UnicornStudio unavailable after load"));
-    script.onerror = () => reject(new Error("UnicornStudio failed to load"));
+    script.onload = () => {
+      if (window.UnicornStudio) {
+        resolve(window.UnicornStudio);
+        return;
+      }
+      sdkPromise = null;
+      reject(new Error("UnicornStudio unavailable after load"));
+    };
+    script.onerror = () => {
+      sdkPromise = null;
+      reject(new Error("UnicornStudio failed to load"));
+    };
     document.head.appendChild(script);
   });
 
@@ -62,9 +69,11 @@ export function NebulaBackground() {
 
     let scene: UnicornScene | null = null;
     let cancelled = false;
+    let mountPending = false;
 
     const mount = () => {
-      if (scene || cancelled) return;
+      if (scene || cancelled || mountPending) return;
+      mountPending = true;
       loadSdk()
         .then((api) =>
           api.addScene({
@@ -78,13 +87,16 @@ export function NebulaBackground() {
           }),
         )
         .then((created) => {
-          if (cancelled) {
+          mountPending = false;
+          if (cancelled || scene) {
             created.destroy();
             return;
           }
           scene = created;
         })
-        .catch(() => undefined);
+        .catch(() => {
+          mountPending = false;
+        });
     };
 
     const teardown = () => {
