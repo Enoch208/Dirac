@@ -23,7 +23,7 @@ interface BentoCardProps {
 function BentoCard({ icon, title, body, className, delay, children }: BentoCardProps) {
   return (
     <Reveal delay={delay} className={`h-full ${className ?? ""}`}>
-      <article className="glass-panel group relative flex h-full flex-col gap-5 overflow-hidden rounded-2xl p-7">
+      <article className="glass-panel gradient-border group relative flex h-full flex-col gap-5 overflow-hidden rounded-2xl p-7">
         <div className="glow-accent-tr pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
         <div className="relative flex flex-col gap-3">
           <HugeiconsIcon icon={icon} size={26} strokeWidth={1.5} className="text-accent" />
