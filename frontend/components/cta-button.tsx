@@ -31,8 +31,10 @@ export function CtaButton({ href, label, size = "md", icon = ArrowRight01Icon, b
   if (!beam) return link;
 
   return (
-    <span className={`relative inline-flex overflow-hidden rounded-full p-px ${className ?? ""}`}>
-      <span className="absolute inset-[-150%] cta-beam" aria-hidden />
+    <span className={`relative inline-flex rounded-full p-px ${className ?? ""}`}>
+      <span className="absolute inset-0 overflow-hidden rounded-full" aria-hidden>
+        <span className="absolute inset-[-150%] cta-beam" />
+      </span>
       <span className="relative inline-flex rounded-full bg-background">{link}</span>
     </span>
   );

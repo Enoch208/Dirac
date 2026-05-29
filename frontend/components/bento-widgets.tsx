@@ -36,10 +36,10 @@ export function LadderPreview() {
         return (
           <div
             key={row.rank}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 ${
+            className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 ${
               row.rank === 1
-                ? "gradient-border bg-accent/[0.07]"
-                : "border border-white/5 bg-white/[0.02]"
+                ? "border-accent/30 bg-accent/[0.07]"
+                : "border-white/5 bg-white/[0.02]"
             }`}
           >
             <span className="font-display text-sm font-semibold text-faint">

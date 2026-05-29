@@ -12,7 +12,7 @@ export function HowItWorks() {
         <SectionHeading eyebrow={LOOP.eyebrow} title={LOOP.title} align="center" />
       </Reveal>
 
-      <div className="gradient-border mt-16 grid gap-px overflow-hidden rounded-2xl border border-white/5 bg-white/5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="gradient-border mt-16 grid gap-px overflow-hidden rounded-2xl bg-white/5 sm:grid-cols-2 lg:grid-cols-4">
         {STEPS.map((step, index) => (
           <Reveal key={step.index} delay={index + 1} className="h-full">
             <article className="flex h-full flex-col gap-5 bg-background p-7">

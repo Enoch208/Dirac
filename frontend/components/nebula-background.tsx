@@ -62,10 +62,12 @@ function isDisabled(): boolean {
 
 export function NebulaBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || isDisabled()) return;
+    const sentinel = sentinelRef.current;
+    if (!container || !sentinel || isDisabled()) return;
 
     let scene: UnicornScene | null = null;
     let cancelled = false;
@@ -108,7 +110,7 @@ export function NebulaBackground() {
       ([entry]) => (entry.isIntersecting ? mount() : teardown()),
       { rootMargin: NEBULA.rootMargin },
     );
-    observer.observe(container);
+    observer.observe(sentinel);
 
     return () => {
       cancelled = true;
@@ -118,11 +120,14 @@ export function NebulaBackground() {
   }, []);
 
   return (
-    <div
-      aria-hidden
-      className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-screen opacity-50 mix-blend-screen brightness-50 saturate-0 [mask-image:linear-gradient(to_bottom,#000_0%,#000_80%,transparent)]"
-    >
-      <div ref={containerRef} className="absolute inset-0" />
-    </div>
+    <>
+      <div ref={sentinelRef} aria-hidden className="pointer-events-none absolute left-0 top-0 h-screen w-px" />
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-screen opacity-50 mix-blend-screen brightness-50 saturate-0 [mask-image:linear-gradient(to_bottom,#000_0%,#000_80%,transparent)]"
+      >
+        <div ref={containerRef} className="absolute inset-0" />
+      </div>
+    </>
   );
 }
