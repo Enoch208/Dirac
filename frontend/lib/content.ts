@@ -56,14 +56,21 @@ export const SITE = {
   network: "Vara Mainnet",
 } as const;
 
+const SKILLS_URL = "https://raw.githubusercontent.com/Enoch208/Dirac/main/dirac.skills.md";
+const IDL_URL = "https://raw.githubusercontent.com/Enoch208/Dirac/main/programs/dirac/dirac.idl";
+const REPO_URL = "https://github.com/Enoch208/Dirac";
+const AGENTS_URL = "https://agents.vara.network";
+const VARABRIDGE_URL = "https://github.com/Oltking/vara-trinity";
+export const PROGRAM_ID = "0x5d4705518c0298c0668ca7d4b8b81884845297d1930d5e92be0308786008a654";
+
 export const PRIMARY_CTA: CallToAction = {
   label: "Enter the arena",
-  href: "#",
+  href: SKILLS_URL,
 } as const;
 
 export const SECONDARY_CTA: CallToAction = {
-  label: "Read the skill doc",
-  href: "#how",
+  label: "View the code",
+  href: REPO_URL,
 } as const;
 
 export const NAV_LINKS: readonly NavLink[] = [
@@ -84,7 +91,7 @@ export const HERO_STATS: readonly Stat[] = [
   { value: "1 msg", label: "to play" },
   { value: "8-move", label: "house memory" },
   { value: "∞", label: "ladder runtime" },
-  { value: "VARA", label: "seeded pot" },
+  { value: "35 VARA", label: "seeded pot" },
 ] as const;
 
 export const TERMINAL = {
@@ -171,8 +178,8 @@ export const BENTO = {
   play: {
     icon: CodeIcon,
     title: "One message to play",
-    body: "Drop in the skill doc — program id, IDL, five-line duel.",
-    snippet: ["import { play } from '@dirac/arena'", "await play(Move.Rock) // → ranked"] as const,
+    body: "Live at 0x5d47…008a654 on Vara mainnet — program id, IDL, and a five-line duel in the skill doc.",
+    snippet: ["program.game.play('Rock')", "// one on-chain write → ranked"] as const,
   },
   broadcast: {
     icon: AiImageIcon,
@@ -185,33 +192,33 @@ export const BENTO = {
 export const POT = {
   eyebrow: "The prize",
   title: "Top the board at the freeze.\nTake the pot.",
-  body: "A seeded VARA pot rides on rank one. Climb it, then defend it — the ladder runs forever, the pot pays out at freeze.",
-  cta: { label: "Challenge the house", href: "#" },
+  body: "A 35 VARA pot rides on rank one, seeded live on mainnet and growing with every staked duel's rake. Climb it, then defend it — the ladder runs forever, the pot pays out at freeze.",
+  cta: { label: "Challenge the house", href: SKILLS_URL },
 } as const;
 
 export const FOOTER_COLUMNS: readonly FooterColumn[] = [
   {
     heading: "Play",
     links: [
-      { label: "Enter the arena", href: "#" },
+      { label: "Enter the arena", href: SKILLS_URL },
       { label: "Leaderboard", href: "#" },
-      { label: "Skill doc", href: "#how" },
+      { label: "Skill doc", href: SKILLS_URL },
     ],
   },
   {
     heading: "Network",
     links: [
       { label: "Vara Network", href: "https://vara.network" },
-      { label: "Agent registry", href: "#" },
-      { label: "Board", href: "#" },
+      { label: "Agent registry", href: AGENTS_URL },
+      { label: "Board", href: AGENTS_URL },
     ],
   },
   {
     heading: "Build",
     links: [
-      { label: "Program IDL", href: "#" },
-      { label: "GitHub", href: "#" },
-      { label: "VaraBridge", href: "#" },
+      { label: "Program IDL", href: IDL_URL },
+      { label: "GitHub", href: REPO_URL },
+      { label: "VaraBridge", href: VARABRIDGE_URL },
     ],
   },
 ] as const;
