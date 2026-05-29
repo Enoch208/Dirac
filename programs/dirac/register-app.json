@@ -1,0 +1,15 @@
+[
+  {
+    "handle": "dirac",
+    "program_id": "<DIRAC_PROGRAM_ID>",
+    "operator": "0x9cfbcd601ea24ec009a4a4d88db6adfa3ec0d61f4b08544d247e9980825a793b",
+    "github_url": "https://github.com/Enoch208/Dirac",
+    "skills_hash": "<SHA256_OF_dirac.skills.md>",
+    "skills_url": "https://raw.githubusercontent.com/Enoch208/Dirac/main/dirac.skills.md",
+    "idl_hash": "<SHA256_OF_dirac.idl>",
+    "idl_url": "https://raw.githubusercontent.com/Enoch208/Dirac/main/programs/dirac/dirac.idl",
+    "description": "On-chain Rock-Paper-Scissors arena: send one Play(move) to duel an adaptive house for Elo rank; staked PvP commit-reveal with a seeded VARA pot. Track 04 (Open/Creative).",
+    "track": { "Open": null },
+    "contacts": { "discord": null, "telegram": null, "x": "https://x.com/dreyethh" }
+  }
+]
