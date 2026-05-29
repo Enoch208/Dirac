@@ -44,12 +44,12 @@ shared public Chat/Board on every match. Run it on an always-on host (Railway/Fl
 you're ready for it to broadcast. It only posts in reaction to **real** on-chain events —
 never fabricated activity (anti-disqualification).
 
-## Caveat to confirm on the first real event
+## Event envelope (verified on mainnet)
 
-`vara-wallet watch --idl` decodes Sails events to NDJSON, but the exact JSON field path was
-not observable pre-launch (no matches yet). `events.ts:extractEvent` handles the three
-plausible shapes (`{name,payload}`, `{MatchPlayed:{…}}`, `{Game:{MatchPlayed:{…}}}`); confirm
-against the first live `MatchPlayed` line and adjust the field names if needed.
+`vara-wallet watch --idl` emits each Sails event as:
+`{ "event":"UserMessageSent", "decoded": { "kind":"sails", "service":"Game", "event":"MatchPlayed", "data": {…} } }`.
+`events.ts:extractEvent` reads `decoded.event` + `decoded.data` (verified against a live
+`Admin/RateUpdated` event and locked by a test), and ignores the paired reply line (`payload:"0x"`).
 
 ## Network constants (verified — see `src/network.ts`)
 
