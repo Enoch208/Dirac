@@ -8,6 +8,7 @@ interface CtaButtonProps {
   label: string;
   size?: "sm" | "md";
   icon?: IconSvgElement;
+  beam?: boolean;
   className?: string;
 }
 
@@ -16,19 +17,23 @@ const SIZE = {
   md: { padding: "px-7 py-3.5", icon: 18, lift: "hover:-translate-y-0.5", nudge: "group-hover:translate-x-1" },
 } as const;
 
-export function CtaButton({ href, label, size = "md", icon = ArrowRight01Icon, className }: CtaButtonProps) {
+export function CtaButton({ href, label, size = "md", icon = ArrowRight01Icon, beam = false, className }: CtaButtonProps) {
   const variant = SIZE[size];
-  return (
-    <Link
-      href={href}
-      className={`group flex items-center justify-center gap-2 rounded-full bg-gradient-to-b from-accent-strong to-accent text-sm font-semibold text-background btn-gloss transition-transform ${variant.padding} ${variant.lift} ${className ?? ""}`}
-    >
+  const linkClasses = `group flex items-center justify-center gap-2 rounded-full bg-gradient-to-b from-accent-strong to-accent text-sm font-semibold text-background btn-gloss transition-transform ${variant.padding} ${variant.lift}`;
+
+  const link = (
+    <Link href={href} className={beam ? linkClasses : `${linkClasses} ${className ?? ""}`}>
       {label}
-      <HugeiconsIcon
-        icon={icon}
-        size={variant.icon}
-        className={`transition-transform ${variant.nudge}`}
-      />
+      <HugeiconsIcon icon={icon} size={variant.icon} className={`transition-transform ${variant.nudge}`} />
     </Link>
+  );
+
+  if (!beam) return link;
+
+  return (
+    <span className={`relative inline-flex overflow-hidden rounded-full p-px ${className ?? ""}`}>
+      <span className="absolute inset-[-150%] cta-beam" aria-hidden />
+      <span className="relative inline-flex rounded-full bg-background">{link}</span>
+    </span>
   );
 }
