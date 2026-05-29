@@ -4,5 +4,4 @@ export const NEBULA = {
   dpi: 1.5,
   scale: 0.75,
   fps: 30,
-  rootMargin: "0px",
 } as const;
