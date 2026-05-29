@@ -3,6 +3,7 @@ import type { IconSvgElement } from "@hugeicons/react";
 import type { ReactNode } from "react";
 import { BENTO, HOUSE } from "@/lib/content";
 import { Reveal } from "./reveal";
+import { SectionHeading } from "./section-heading";
 import {
   HousePredictor,
   LadderPreview,
@@ -23,7 +24,7 @@ function BentoCard({ icon, title, body, className, delay, children }: BentoCardP
   return (
     <Reveal delay={delay} className={`h-full ${className ?? ""}`}>
       <article className="glass-panel group relative flex h-full flex-col gap-5 overflow-hidden rounded-2xl p-7">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(245,181,68,0.1),transparent_60%)] opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
+        <div className="glow-accent-tr pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
         <div className="relative flex flex-col gap-3">
           <HugeiconsIcon icon={icon} size={26} strokeWidth={1.5} className="text-accent" />
           <h3 className="font-display text-xl font-semibold">{title}</h3>
@@ -38,17 +39,11 @@ function BentoCard({ icon, title, body, className, delay, children }: BentoCardP
 export function FeatureBento() {
   return (
     <section id="house" className="border-t border-white/5 bg-surface/40">
-      <div className="relative mx-auto max-w-6xl px-6 py-28">
-        <div className="pointer-events-none absolute right-0 top-20 -z-10 h-[420px] w-[600px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(245,181,68,0.08),transparent_70%)] blur-3xl" />
+      <div className="relative mx-auto max-w-6xl overflow-hidden px-6 py-28">
+        <div className="glow-accent pointer-events-none absolute right-0 top-20 -z-10 h-[420px] w-[600px] rounded-full opacity-70 blur-3xl" />
 
         <Reveal className="max-w-2xl">
-          <p className="font-mono text-xs uppercase tracking-[0.22em] text-accent">
-            {HOUSE.eyebrow}
-          </p>
-          <h2 className="mt-4 whitespace-pre-line font-display text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
-            {HOUSE.title}
-          </h2>
-          <p className="mt-5 text-lg leading-relaxed text-muted">{HOUSE.body}</p>
+          <SectionHeading eyebrow={HOUSE.eyebrow} title={HOUSE.title} body={HOUSE.body} />
         </Reveal>
 
         <div className="mt-16 grid gap-5 lg:grid-cols-3">

@@ -1,7 +1,7 @@
 use crate::config::{Config, STARTING_RATING};
 use crate::types::Move;
-use colosseum_logic::leaderboard::Entry;
-use colosseum_logic::rps::Move as LogicMove;
+use dirac_logic::leaderboard::Entry;
+use dirac_logic::rps::Move as LogicMove;
 use sails_rs::collections::BTreeMap;
 use sails_rs::prelude::*;
 

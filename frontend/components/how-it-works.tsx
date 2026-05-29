@@ -1,19 +1,15 @@
 import { HugeiconsIcon } from "@hugeicons/react";
-import { STEPS } from "@/lib/content";
+import { LOOP, STEPS } from "@/lib/content";
 import { Reveal } from "./reveal";
+import { SectionHeading } from "./section-heading";
 
 export function HowItWorks() {
   return (
-    <section id="how" className="relative mx-auto max-w-6xl px-6 py-28">
-      <div className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[360px] w-[700px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(245,181,68,0.06),transparent_70%)] blur-3xl" />
+    <section id="how" className="relative mx-auto max-w-6xl overflow-hidden px-6 py-28">
+      <div className="glow-accent pointer-events-none absolute left-1/2 top-0 -z-10 h-[360px] w-[700px] -translate-x-1/2 rounded-full opacity-50 blur-3xl" />
 
-      <Reveal className="mx-auto max-w-2xl text-center">
-        <p className="font-mono text-xs uppercase tracking-[0.22em] text-accent">
-          The loop
-        </p>
-        <h2 className="mt-4 font-display text-4xl font-semibold tracking-tight sm:text-5xl">
-          One call in. A ranked duel out.
-        </h2>
+      <Reveal className="mx-auto max-w-2xl">
+        <SectionHeading eyebrow={LOOP.eyebrow} title={LOOP.title} align="center" />
       </Reveal>
 
       <div className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-white/5 bg-white/5 sm:grid-cols-2 lg:grid-cols-4">

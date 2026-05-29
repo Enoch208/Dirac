@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { POT, POT_ICON } from "@/lib/content";
-import { ArrowRight01Icon } from "@/lib/icons";
+import { CtaButton } from "./cta-button";
 import { Reveal } from "./reveal";
 
 export function PotBanner() {
@@ -21,17 +20,7 @@ export function PotBanner() {
               {POT.title}
             </h2>
             <p className="mt-6 text-lg leading-relaxed text-muted">{POT.body}</p>
-            <Link
-              href={POT.cta.href}
-              className="group mt-10 flex items-center gap-2 rounded-full bg-gradient-to-b from-accent-strong to-accent px-7 py-3.5 text-sm font-semibold text-background btn-gloss transition-transform hover:-translate-y-0.5"
-            >
-              {POT.cta.label}
-              <HugeiconsIcon
-                icon={ArrowRight01Icon}
-                size={18}
-                className="transition-transform group-hover:translate-x-1"
-              />
-            </Link>
+            <CtaButton href={POT.cta.href} label={POT.cta.label} className="mt-10" />
           </div>
         </div>
       </Reveal>

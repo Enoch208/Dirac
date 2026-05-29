@@ -1,15 +1,13 @@
-#![allow(unused_imports)]
-
 use crate::config::{Config, RECENT_WINDOW};
 use crate::state::{Commit, GameState, Match, MatchState, MatchView, PlayerRecord, PlayerStats};
 use crate::types::{Move, Outcome, RoundResult};
-use colosseum_logic::commit::verify_commit;
-use colosseum_logic::elo::{rating_delta, score_milli};
-use colosseum_logic::escrow::{decisive_payout, draw_payout, stake_to_vara};
-use colosseum_logic::house::house_move;
-use colosseum_logic::leaderboard::update_leaderboard;
-use colosseum_logic::rng::{seed_from, SplitMix64};
-use colosseum_logic::rps::{resolve, Move as LogicMove, Outcome as LogicOutcome};
+use dirac_logic::commit::verify_commit;
+use dirac_logic::elo::{rating_delta, score_milli};
+use dirac_logic::escrow::{decisive_payout, draw_payout, stake_to_vara};
+use dirac_logic::house::house_move;
+use dirac_logic::leaderboard::update_leaderboard;
+use dirac_logic::rng::{seed_from, SplitMix64};
+use dirac_logic::rps::{resolve, Move as LogicMove, Outcome as LogicOutcome};
 use sails_rs::cell::RefCell;
 use sails_rs::gstd::{exec, msg};
 use sails_rs::prelude::*;
@@ -231,13 +229,13 @@ impl GameService<'_> {
                 return Err("match not awaiting reveal".into());
             }
             if caller == game_match.challenger {
-                if !verify_commit(match_id, logic_move, &salt, &game_match.challenger_commit) {
+                if !verify_commit(logic_move, &salt, &game_match.challenger_commit) {
                     return Err("reveal does not match commit".into());
                 }
                 game_match.challenger_reveal = Some(logic_move);
             } else if caller == game_match.opponent {
                 let commit = game_match.opponent_commit.ok_or("opponent has not committed")?;
-                if !verify_commit(match_id, logic_move, &salt, &commit) {
+                if !verify_commit(logic_move, &salt, &commit) {
                     return Err("reveal does not match commit".into());
                 }
                 game_match.opponent_reveal = Some(logic_move);
@@ -291,6 +289,7 @@ impl GameService<'_> {
         }
     }
 
+    #[export]
     pub fn get_leaderboard(&self, top: u32) -> Vec<LeaderboardEntry> {
         let state = self.state.borrow();
         state
@@ -301,14 +300,17 @@ impl GameService<'_> {
             .collect()
     }
 
+    #[export]
     pub fn get_player(&self, who: ActorId) -> Option<PlayerStats> {
         self.state.borrow().players.get(&who).map(PlayerStats::from)
     }
 
+    #[export]
     pub fn get_match(&self, match_id: u64) -> Option<MatchView> {
         self.state.borrow().matches.get(&match_id).map(MatchView::from)
     }
 
+    #[export]
     pub fn get_pot(&self) -> u128 {
         self.state.borrow().pot
     }

@@ -17,6 +17,34 @@ type Outcome = enum {
   Draw,
 };
 
+type LeaderboardEntry = struct {
+  player: actor_id,
+  rating: i32,
+};
+
+type MatchView = struct {
+  challenger: actor_id,
+  opponent: actor_id,
+  stake_vara: u128,
+  deadline_block: u32,
+  state: MatchState,
+};
+
+type MatchState = enum {
+  AwaitingOpponent,
+  AwaitingReveal,
+  Settled,
+  Refunded,
+};
+
+type PlayerStats = struct {
+  rating: i32,
+  games: u32,
+  wins: u32,
+  losses: u32,
+  draws: u32,
+};
+
 type Config = struct {
   house_epsilon_bps: u64,
   elo_k: i32,
@@ -39,6 +67,10 @@ service Game {
   ClaimTimeout : (match_id: u64) -> null;
   Play : (player_move: Move) -> RoundResult;
   Reveal : (match_id: u64, player_move: Move, salt: [u8, 32]) -> null;
+  query GetLeaderboard : (top: u32) -> vec LeaderboardEntry;
+  query GetMatch : (match_id: u64) -> opt MatchView;
+  query GetPlayer : (who: actor_id) -> opt PlayerStats;
+  query GetPot : () -> u128;
 
   events {
     MatchPlayed: struct {

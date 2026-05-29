@@ -1,4 +1,5 @@
 #![no_std]
+#![allow(unused_imports)]
 
 use sails_rs::cell::RefCell;
 use sails_rs::gstd::msg;
@@ -10,12 +11,12 @@ mod game;
 mod state;
 mod types;
 
-pub struct ColosseumProgram {
+pub struct DiracProgram {
     state: RefCell<state::GameState>,
 }
 
 #[program]
-impl ColosseumProgram {
+impl DiracProgram {
     pub fn new() -> Self {
         let mut initial = state::GameState::default();
         initial.operator = msg::source();

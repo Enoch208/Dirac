@@ -1,18 +1,19 @@
 [package]
-name = "colosseum"
+name = "dirac"
 version = "0.1.0"
 edition = "2024"
 license.workspace = true
 
 [dependencies]
 sails-rs = "0.10.4"
-colosseum-logic = { path = "../../crates/colosseum-logic" }
+dirac-logic = { path = "../../crates/dirac-logic" }
 
 [build-dependencies]
 sails-rs = { version = "0.10.4", features = ["wasm-builder"] }
 
 [dev-dependencies]
-colosseum-client = { path = "../colosseum-client" }
+dirac-client = { path = "../dirac-client" }
+dirac-logic = { path = "../../crates/dirac-logic" }
 gtest = "=1.10.0"
 gstd = "=1.10.0"
 sails-rs = { version = "0.10.4", features = ["gtest", "gclient"] }

@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { NAV_LINKS, PRIMARY_CTA, SITE } from "@/lib/content";
-import { ArrowRight01Icon } from "@/lib/icons";
+import { CtaButton } from "./cta-button";
 
 export function SiteNav() {
   return (
@@ -29,17 +28,12 @@ export function SiteNav() {
           ))}
         </ul>
 
-        <Link
+        <CtaButton
           href={PRIMARY_CTA.href}
-          className="group ml-2 flex items-center gap-1.5 rounded-full bg-gradient-to-b from-accent-strong to-accent px-4 py-2 text-sm font-semibold text-background btn-gloss transition-transform hover:-translate-y-px"
-        >
-          {PRIMARY_CTA.label}
-          <HugeiconsIcon
-            icon={ArrowRight01Icon}
-            size={16}
-            className="transition-transform group-hover:translate-x-0.5"
-          />
-        </Link>
+          label={PRIMARY_CTA.label}
+          size="sm"
+          className="ml-2"
+        />
       </nav>
     </header>
   );

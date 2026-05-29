@@ -1,4 +1,4 @@
 /target
 
 # generated sails client
-programs/colosseum-client/src/colosseum_client.rs
+programs/dirac-client/src/dirac_client.rs

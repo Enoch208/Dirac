@@ -1,4 +1,4 @@
-use colosseum_logic::rps::{Move as LogicMove, Outcome as LogicOutcome};
+use dirac_logic::rps::{Move as LogicMove, Outcome as LogicOutcome};
 use sails_rs::prelude::*;
 
 #[derive(Encode, Decode, TypeInfo, Clone, Copy, PartialEq, Eq, Debug)]

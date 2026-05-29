@@ -1,5 +1,5 @@
 [package]
-name = "colosseum-client"
+name = "dirac-client"
 version = "0.1.0"
 edition = "2024"
 license.workspace = true
@@ -9,7 +9,7 @@ mockall = { version = "0.12", optional = true }
 sails-rs = "0.10.4"
 
 [build-dependencies]
-colosseum = { path = "../colosseum" }
+dirac = { path = "../dirac" }
 sails-rs = { version = "0.10.4", features = ["build"] }
 
 [features]

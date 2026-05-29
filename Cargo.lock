@@ -990,34 +990,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "colosseum"
-version = "0.1.0"
-dependencies = [
- "colosseum-client",
- "colosseum-logic",
- "gstd",
- "gtest",
- "sails-rs",
- "tokio",
-]
-
-[[package]]
-name = "colosseum-client"
-version = "0.1.0"
-dependencies = [
- "colosseum",
- "mockall",
- "sails-rs",
-]
-
-[[package]]
-name = "colosseum-logic"
-version = "0.1.0"
-dependencies = [
- "sha2 0.10.9",
-]
-
-[[package]]
 name = "combine"
 version = "4.6.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1526,6 +1498,34 @@ dependencies = [
  "const-oid",
  "crypto-common",
  "subtle",
+]
+
+[[package]]
+name = "dirac"
+version = "0.1.0"
+dependencies = [
+ "dirac-client",
+ "dirac-logic",
+ "gstd",
+ "gtest",
+ "sails-rs",
+ "tokio",
+]
+
+[[package]]
+name = "dirac-client"
+version = "0.1.0"
+dependencies = [
+ "dirac",
+ "mockall",
+ "sails-rs",
+]
+
+[[package]]
+name = "dirac-logic"
+version = "0.1.0"
+dependencies = [
+ "sha2 0.10.9",
 ]
 
 [[package]]

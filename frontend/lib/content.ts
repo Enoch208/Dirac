@@ -103,6 +103,11 @@ export const TERMINAL = {
   ] satisfies readonly TerminalLine[],
 } as const;
 
+export const LOOP = {
+  eyebrow: "The loop",
+  title: "One call in. A ranked duel out.",
+} as const;
+
 export const HOUSE = {
   eyebrow: "The adaptive house",
   title: "Spamming gets you nowhere.\nOnly strategy climbs.",

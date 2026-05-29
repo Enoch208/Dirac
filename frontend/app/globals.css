@@ -48,6 +48,7 @@
   html {
     scroll-behavior: smooth;
     background-color: var(--color-background);
+    overflow-x: clip;
   }
 
   body {
@@ -57,6 +58,7 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     overscroll-behavior: none;
+    overflow-x: clip;
   }
 
   ::selection {
@@ -114,6 +116,14 @@
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
+  }
+
+  .glow-accent {
+    background-image: radial-gradient(ellipse at center, color-mix(in oklab, var(--color-accent) 13%, transparent), transparent 68%);
+  }
+
+  .glow-accent-tr {
+    background-image: radial-gradient(ellipse at top right, color-mix(in oklab, var(--color-accent) 11%, transparent), transparent 60%);
   }
 
   .bg-dots {

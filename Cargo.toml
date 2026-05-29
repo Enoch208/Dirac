@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/colosseum-logic", "programs/colosseum", "programs/colosseum-client"]
+members = ["crates/dirac-logic", "programs/dirac", "programs/dirac-client"]
 
 [workspace.package]
 edition = "2021"
