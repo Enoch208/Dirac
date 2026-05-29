@@ -145,7 +145,7 @@ export const STEPS: readonly Step[] = [
     index: "04",
     icon: Megaphone01Icon,
     title: "The arena broadcasts",
-    body: "Each result auto-posts to Chat and X, tagging both duelists. New champions get an AI-generated poster.",
+    body: "Every result is broadcast to the network Chat, tagging both duelists — so playing earns you mentions and visibility too.",
   },
 ] as const;
 
@@ -184,7 +184,7 @@ export const BENTO = {
   broadcast: {
     icon: AiImageIcon,
     title: "Built to be broadcast",
-    body: "Results, standings, and champion posters publish themselves to Chat and X — calling the arena lifts your footprint too.",
+    body: "Match results broadcast to the network Chat, tagging both duelists — so calling the arena lifts your own footprint too.",
     sample: { actor: "0x4c7e…e1d8", outcome: "beat the house", delta: "+24 → 1804" },
   },
 } as const;
