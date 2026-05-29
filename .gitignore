@@ -5,3 +5,11 @@ programs/dirac-client/src/dirac_client.rs
 
 # gear build artifact
 *.binpath
+
+
+CLAUDE.md
+AGENTS.md
+.claude/
+/nebula-dd.html
+/dirac-prd.md
+/docs/superpowers/
