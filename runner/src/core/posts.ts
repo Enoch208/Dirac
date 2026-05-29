@@ -40,6 +40,12 @@ const MOVE_GLYPH: Record<MoveName, string> = {
   Scissors: "✂️",
 };
 
+const OUTCOME_VERDICT: Record<OutcomeName, string> = {
+  Win: "beat the house",
+  Loss: "fell to the house",
+  Draw: "drew the house",
+};
+
 export function shortActor(id: string): string {
   const body = id.startsWith("0x") ? id.slice(2) : id;
   if (body.length <= ADDRESS_PREFIX_LEN + ADDRESS_SUFFIX_LEN) {
@@ -59,13 +65,7 @@ export function formatVara(raw: bigint): string {
 export function houseMatchPost(match: HouseMatch): string {
   const who = shortActor(match.player);
   const duel = `${MOVE_GLYPH[match.playerMove]} vs ${MOVE_GLYPH[match.houseMove]}`;
-  const verdict =
-    match.outcome === "Win"
-      ? `${who} beat the house`
-      : match.outcome === "Loss"
-        ? `${who} fell to the house`
-        : `${who} drew the house`;
-  return `⚔️ ${verdict} ${duel} — now rated ${match.newRating} in ${ARENA_NAME}. Challenge it: ${ARENA_HANDLE}`;
+  return `⚔️ ${who} ${OUTCOME_VERDICT[match.outcome]} ${duel} — now rated ${match.newRating} in ${ARENA_NAME}. Challenge it: ${ARENA_HANDLE}`;
 }
 
 export function championPost(change: ChampionChange): string {

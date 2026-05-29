@@ -2,7 +2,7 @@ use crate::config::{Config, RECENT_WINDOW};
 use crate::state::{Commit, GameState, Match, MatchState, MatchView, PlayerRecord, PlayerStats};
 use crate::types::{Move, Outcome, RoundResult};
 use dirac_logic::commit::verify_commit;
-use dirac_logic::elo::{rating_delta, score_milli, SCORE_LOSS, SCORE_WIN};
+use dirac_logic::elo::{rating_delta, score_milli};
 use dirac_logic::escrow::{decisive_payout, draw_payout, stake_to_vara};
 use dirac_logic::house::house_move;
 use dirac_logic::leaderboard::update_leaderboard;
@@ -328,78 +328,33 @@ impl GameService<'_> {
 }
 
 fn settle(state: &mut GameState, match_id: u64, config: Config) -> Vec<GameEvents> {
-    let mut events = Vec::new();
     let Some((challenger, opponent, c_move, o_move, stake)) = read_revealed(state, match_id) else {
-        return events;
+        return Vec::new();
+    };
+    let c_outcome = resolve(c_move, o_move);
+    let champion = apply_ratings(state, config, challenger, c_outcome, opponent, resolve(o_move, c_move));
+    mark_settled(state, match_id);
+
+    let (winner, payout) = match winner_of(c_outcome, challenger, opponent) {
+        Some(addr) => (Some(addr), pay_winner(state, addr, stake, config.rake_bps)),
+        None => {
+            let split = draw_payout(stake);
+            refund(challenger, split.challenger_refund);
+            refund(opponent, split.opponent_refund);
+            (None, split.challenger_refund.saturating_add(split.opponent_refund))
+        }
     };
 
-        let c_outcome = resolve(c_move, o_move);
-        let o_outcome = resolve(o_move, c_move);
-        let c_rating = state.record_mut(challenger).rating;
-        let o_rating = state.record_mut(opponent).rating;
-        let c_delta = rating_delta(c_rating, o_rating, score_milli(c_outcome), config.elo_k);
-        let o_delta = rating_delta(o_rating, c_rating, score_milli(o_outcome), config.elo_k);
-
-        apply_pvp_result(state.record_mut(challenger), c_delta, c_outcome);
-        apply_pvp_result(state.record_mut(opponent), o_delta, o_outcome);
-        let c_new = state.record_mut(challenger).rating;
-        let o_new = state.record_mut(opponent).rating;
-
-        let capacity = config.leaderboard_capacity as usize;
-        let champ_a = update_leaderboard(&mut state.leaderboard, challenger.into_bytes(), c_new, capacity);
-        let champ_b = update_leaderboard(&mut state.leaderboard, opponent.into_bytes(), o_new, capacity);
-
-        let (winner, payout_amount, refund_each, rake) = match c_outcome {
-            LogicOutcome::Win => {
-                let p = decisive_payout(stake, config.rake_bps);
-                (Some(challenger), p.winner_amount, 0u128, p.rake)
-            }
-            LogicOutcome::Loss => {
-                let p = decisive_payout(stake, config.rake_bps);
-                (Some(opponent), p.winner_amount, 0u128, p.rake)
-            }
-            LogicOutcome::Draw => {
-                let p = draw_payout(stake);
-                (None, 0u128, p.challenger_refund, p.rake)
-            }
-        };
-
-        state.pot = state.pot.saturating_add(rake);
-        if let Some(m) = state.matches.get_mut(&match_id) {
-            m.state = MatchState::Settled;
-        }
-        let new_champion = if champ_a {
-            Some((challenger, c_new))
-        } else if champ_b {
-            Some((opponent, o_new))
-        } else {
-            None
-        };
-
-        match winner {
-            Some(addr) => refund(addr, payout_amount),
-            None => {
-                refund(challenger, refund_each);
-                refund(opponent, refund_each);
-            }
-        }
-
-        let event_payout = match winner {
-            Some(_) => payout_amount,
-            None => refund_each.saturating_mul(2),
-        };
-        events.push(GameEvents::PvpResolved {
-            match_id,
-            winner,
-            challenger_move: c_move.into(),
-            opponent_move: o_move.into(),
-            payout: event_payout,
-        });
-        if let Some((player, rating)) = new_champion {
-            events.push(GameEvents::NewChampion { player, rating });
-        }
-        events
-    }
+    let mut events = vec![GameEvents::PvpResolved {
+        match_id,
+        winner,
+        challenger_move: c_move.into(),
+        opponent_move: o_move.into(),
+        payout,
+    }];
+    push_champion(&mut events, champion);
+    events
+}
 
 fn settle_timeout(state: &mut GameState, match_id: u64, config: Config) -> Vec<GameEvents> {
     let Some((challenger, opponent, challenger_revealed, opponent_revealed, stake)) =
@@ -430,33 +385,69 @@ fn award_forfeit(
     loser: ActorId,
     stake: u128,
 ) -> Vec<GameEvents> {
-    let winner_rating = state.record_mut(winner).rating;
-    let loser_rating = state.record_mut(loser).rating;
-    let winner_delta = rating_delta(winner_rating, loser_rating, SCORE_WIN, config.elo_k);
-    let loser_delta = rating_delta(loser_rating, winner_rating, SCORE_LOSS, config.elo_k);
-    apply_pvp_result(state.record_mut(winner), winner_delta, LogicOutcome::Win);
-    apply_pvp_result(state.record_mut(loser), loser_delta, LogicOutcome::Loss);
-    let winner_new = state.record_mut(winner).rating;
-    let loser_new = state.record_mut(loser).rating;
+    let champion = apply_ratings(state, config, winner, LogicOutcome::Win, loser, LogicOutcome::Loss);
+    mark_settled(state, match_id);
+    pay_winner(state, winner, stake, config.rake_bps);
+
+    let mut events = vec![GameEvents::MatchForfeited { match_id, winner, loser }];
+    push_champion(&mut events, champion);
+    events
+}
+
+fn winner_of(challenger_outcome: LogicOutcome, challenger: ActorId, opponent: ActorId) -> Option<ActorId> {
+    match challenger_outcome {
+        LogicOutcome::Win => Some(challenger),
+        LogicOutcome::Loss => Some(opponent),
+        LogicOutcome::Draw => None,
+    }
+}
+
+fn apply_ratings(
+    state: &mut GameState,
+    config: Config,
+    a: ActorId,
+    a_outcome: LogicOutcome,
+    b: ActorId,
+    b_outcome: LogicOutcome,
+) -> Option<(ActorId, i32)> {
+    let a_rating = state.record_mut(a).rating;
+    let b_rating = state.record_mut(b).rating;
+    let a_delta = rating_delta(a_rating, b_rating, score_milli(a_outcome), config.elo_k);
+    let b_delta = rating_delta(b_rating, a_rating, score_milli(b_outcome), config.elo_k);
+    apply_pvp_result(state.record_mut(a), a_delta, a_outcome);
+    apply_pvp_result(state.record_mut(b), b_delta, b_outcome);
+    let a_new = state.record_mut(a).rating;
+    let b_new = state.record_mut(b).rating;
 
     let capacity = config.leaderboard_capacity as usize;
-    let champ_winner = update_leaderboard(&mut state.leaderboard, winner.into_bytes(), winner_new, capacity);
-    let champ_loser = update_leaderboard(&mut state.leaderboard, loser.into_bytes(), loser_new, capacity);
+    let champ_a = update_leaderboard(&mut state.leaderboard, a.into_bytes(), a_new, capacity);
+    let champ_b = update_leaderboard(&mut state.leaderboard, b.into_bytes(), b_new, capacity);
+    if champ_a {
+        Some((a, a_new))
+    } else if champ_b {
+        Some((b, b_new))
+    } else {
+        None
+    }
+}
 
-    let payout = decisive_payout(stake, config.rake_bps);
+fn pay_winner(state: &mut GameState, winner: ActorId, stake: u128, rake_bps: u16) -> u128 {
+    let payout = decisive_payout(stake, rake_bps);
     state.pot = state.pot.saturating_add(payout.rake);
+    refund(winner, payout.winner_amount);
+    payout.winner_amount
+}
+
+fn mark_settled(state: &mut GameState, match_id: u64) {
     if let Some(game_match) = state.matches.get_mut(&match_id) {
         game_match.state = MatchState::Settled;
     }
-    refund(winner, payout.winner_amount);
+}
 
-    let mut events = vec![GameEvents::MatchForfeited { match_id, winner, loser }];
-    if champ_winner {
-        events.push(GameEvents::NewChampion { player: winner, rating: winner_new });
-    } else if champ_loser {
-        events.push(GameEvents::NewChampion { player: loser, rating: loser_new });
+fn push_champion(events: &mut Vec<GameEvents>, champion: Option<(ActorId, i32)>) {
+    if let Some((player, rating)) = champion {
+        events.push(GameEvents::NewChampion { player, rating });
     }
-    events
 }
 
 fn read_reveal_status(state: &GameState, match_id: u64) -> Option<(ActorId, ActorId, bool, bool, u128)> {

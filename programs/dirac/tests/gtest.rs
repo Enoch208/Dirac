@@ -94,11 +94,11 @@ async fn staked_pvp_pays_the_winner_and_takes_rake() {
     let commit_c = commit_hash(LogicMove::Rock, &salt_c);
     let commit_o = commit_hash(LogicMove::Scissors, &salt_o);
 
-    let mut challenger = Actor::<dirac_client::DiracProgram, _>::new(
+    let challenger = Actor::<dirac_client::DiracProgram, _>::new(
         env.clone().with_actor_id(CHALLENGER.into()),
         program_id,
     );
-    let mut opponent = Actor::<dirac_client::DiracProgram, _>::new(
+    let opponent = Actor::<dirac_client::DiracProgram, _>::new(
         env.clone().with_actor_id(OPPONENT.into()),
         program_id,
     );
@@ -160,8 +160,8 @@ async fn staked_pvp_draw_refunds_both_players() {
     let commit_c = commit_hash(LogicMove::Paper, &salt_c);
     let commit_o = commit_hash(LogicMove::Paper, &salt_o);
 
-    let mut challenger = player(&env, CHALLENGER, program_id);
-    let mut opponent = player(&env, OPPONENT, program_id);
+    let challenger = player(&env, CHALLENGER, program_id);
+    let opponent = player(&env, OPPONENT, program_id);
 
     let match_id = challenger
         .game()
@@ -215,8 +215,8 @@ async fn timeout_awards_forfeit_to_sole_revealer() {
     let commit_c = commit_hash(LogicMove::Rock, &salt_c);
     let commit_o = commit_hash(LogicMove::Scissors, &[6u8; 32]);
 
-    let mut challenger = player(&env, CHALLENGER, program_id);
-    let mut opponent = player(&env, OPPONENT, program_id);
+    let challenger = player(&env, CHALLENGER, program_id);
+    let opponent = player(&env, OPPONENT, program_id);
 
     let match_id = challenger
         .game()
