@@ -5,6 +5,7 @@ import { CodeIcon } from "@/lib/icons";
 import { CtaButton } from "./cta-button";
 import { Reveal } from "./reveal";
 import { TerminalWindow } from "./terminal-window";
+import { FlipText } from "./flip-text";
 
 const LAST_WORD = HERO.titleWords.length - 1;
 
@@ -52,14 +53,14 @@ export function Hero() {
             <span className="text-accent-strong">{HERO.tag}</span>
           </div>
 
-          <h1 className="font-display text-[clamp(2.5rem,9vw,6rem)] font-bold leading-[0.95] tracking-[-0.03em]">
+          <h1 className="flex flex-wrap justify-center gap-x-[0.3em] font-display text-[clamp(2.5rem,9vw,6rem)] font-bold leading-[0.95] tracking-[-0.03em]">
             {HERO.titleWords.map((word, index) => (
-              <span
+              <FlipText
                 key={word}
-                className={index === LAST_WORD ? "text-gradient-accent" : "text-gradient-fade"}
-              >
-                {index === LAST_WORD ? word : `${word} `}
-              </span>
+                word={word}
+                baseClassName={index === LAST_WORD ? "text-gradient-accent" : "text-gradient-fade"}
+                revealClassName={index === LAST_WORD ? "text-accent-strong" : "text-foreground"}
+              />
             ))}
           </h1>
 
@@ -68,7 +69,7 @@ export function Hero() {
           </p>
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <CtaButton href={PRIMARY_CTA.href} label={PRIMARY_CTA.label} />
+            <CtaButton href={PRIMARY_CTA.href} label={PRIMARY_CTA.label} beam />
             <Link
               href={SECONDARY_CTA.href}
               className="btn-glass flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.06]"
