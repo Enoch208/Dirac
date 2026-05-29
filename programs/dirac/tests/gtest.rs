@@ -33,6 +33,15 @@ fn create_env() -> (GtestEnv, CodeId) {
     (env, code_id)
 }
 
+fn player(env: &GtestEnv, who: u64, program_id: ActorId) -> Actor<dirac_client::DiracProgram, GtestEnv> {
+    Actor::new(env.clone().with_actor_id(who.into()), program_id)
+}
+
+fn mailbox_has_value(env: &GtestEnv, program_id: ActorId, who: u64) -> bool {
+    let mailbox = env.system().get_mailbox(who);
+    mailbox.contains(&Log::builder().source(program_id).dest(ActorId::from(who)))
+}
+
 #[tokio::test]
 async fn play_resolves_and_records_the_player() {
     use dirac_client::game::events::GameEvents;
@@ -137,4 +146,103 @@ async fn staked_pvp_pays_the_winner_and_takes_rake() {
         challenger_after_payout - challenger_before_payout > 9_000_000_000_000,
         "winner not paid: before={challenger_before_payout} after={challenger_after_payout}",
     );
+}
+
+#[tokio::test]
+async fn staked_pvp_draw_refunds_both_players() {
+    let (env, code_id) = create_env();
+    let program = env.deploy(code_id, vec![]).new().await.unwrap();
+    let program_id = program.id();
+    program.admin().set_vara_usd_rate(RATE_MICRO_USD_PER_VARA).await.unwrap();
+
+    let salt_c = [3u8; 32];
+    let salt_o = [4u8; 32];
+    let commit_c = commit_hash(LogicMove::Paper, &salt_c);
+    let commit_o = commit_hash(LogicMove::Paper, &salt_o);
+
+    let mut challenger = player(&env, CHALLENGER, program_id);
+    let mut opponent = player(&env, OPPONENT, program_id);
+
+    let match_id = challenger
+        .game()
+        .challenge(OPPONENT.into(), commit_c, STAKE_USD)
+        .with_value(STAKE_VARA)
+        .await
+        .unwrap();
+    opponent
+        .game()
+        .accept_challenge(match_id, commit_o)
+        .with_value(STAKE_VARA)
+        .await
+        .unwrap();
+
+    challenger.game().reveal(match_id, Move::Paper, salt_c).await.unwrap();
+    opponent.game().reveal(match_id, Move::Paper, salt_o).await.unwrap();
+    for _ in 0..3 {
+        env.run_next_block();
+    }
+
+    assert_eq!(program.game().get_pot().await.unwrap(), 0, "draw must not take rake");
+    assert!(mailbox_has_value(&env, program_id, CHALLENGER), "challenger not refunded");
+    assert!(mailbox_has_value(&env, program_id, OPPONENT), "opponent not refunded");
+    let view = program.game().get_match(match_id).await.unwrap().unwrap();
+    assert_eq!(view.state, dirac_client::MatchState::Settled);
+}
+
+#[tokio::test]
+async fn timeout_awards_forfeit_to_sole_revealer() {
+    let (env, code_id) = create_env();
+    let program = env.deploy(code_id, vec![]).new().await.unwrap();
+    let program_id = program.id();
+    program.admin().set_vara_usd_rate(RATE_MICRO_USD_PER_VARA).await.unwrap();
+    program
+        .admin()
+        .set_config(dirac_client::Config {
+            house_epsilon_bps: 2000,
+            elo_k: 32,
+            house_rating: 1500,
+            leaderboard_capacity: 100,
+            max_rate_age_blocks: 1800,
+            rake_bps: 250,
+            reveal_deadline_blocks: 2,
+            min_stake_usd: 1,
+            max_stake_usd: 1000,
+        })
+        .await
+        .unwrap();
+
+    let salt_c = [5u8; 32];
+    let commit_c = commit_hash(LogicMove::Rock, &salt_c);
+    let commit_o = commit_hash(LogicMove::Scissors, &[6u8; 32]);
+
+    let mut challenger = player(&env, CHALLENGER, program_id);
+    let mut opponent = player(&env, OPPONENT, program_id);
+
+    let match_id = challenger
+        .game()
+        .challenge(OPPONENT.into(), commit_c, STAKE_USD)
+        .with_value(STAKE_VARA)
+        .await
+        .unwrap();
+    opponent
+        .game()
+        .accept_challenge(match_id, commit_o)
+        .with_value(STAKE_VARA)
+        .await
+        .unwrap();
+
+    challenger.game().reveal(match_id, Move::Rock, salt_c).await.unwrap();
+    for _ in 0..4 {
+        env.run_next_block();
+    }
+
+    opponent.game().claim_timeout(match_id).await.unwrap();
+    for _ in 0..3 {
+        env.run_next_block();
+    }
+
+    assert_eq!(program.game().get_pot().await.unwrap(), EXPECTED_RAKE, "forfeit must take rake");
+    assert!(mailbox_has_value(&env, program_id, CHALLENGER), "forfeit winner not paid");
+    let view = program.game().get_match(match_id).await.unwrap().unwrap();
+    assert_eq!(view.state, dirac_client::MatchState::Settled);
 }

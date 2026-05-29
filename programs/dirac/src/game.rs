@@ -2,7 +2,7 @@ use crate::config::{Config, RECENT_WINDOW};
 use crate::state::{Commit, GameState, Match, MatchState, MatchView, PlayerRecord, PlayerStats};
 use crate::types::{Move, Outcome, RoundResult};
 use dirac_logic::commit::verify_commit;
-use dirac_logic::elo::{rating_delta, score_milli};
+use dirac_logic::elo::{rating_delta, score_milli, SCORE_LOSS, SCORE_WIN};
 use dirac_logic::escrow::{decisive_payout, draw_payout, stake_to_vara};
 use dirac_logic::house::house_move;
 use dirac_logic::leaderboard::update_leaderboard;
@@ -278,7 +278,7 @@ impl GameService<'_> {
                 Ok(())
             }
             MatchState::AwaitingReveal => {
-                let events = settle(&mut state, match_id, config);
+                let events = settle_timeout(&mut state, match_id, config);
                 drop(state);
                 for event in events {
                     let _ = self.emit_event(event);
@@ -400,6 +400,75 @@ fn settle(state: &mut GameState, match_id: u64, config: Config) -> Vec<GameEvent
         }
         events
     }
+
+fn settle_timeout(state: &mut GameState, match_id: u64, config: Config) -> Vec<GameEvents> {
+    let Some((challenger, opponent, challenger_revealed, opponent_revealed, stake)) =
+        read_reveal_status(state, match_id)
+    else {
+        return Vec::new();
+    };
+    match (challenger_revealed, opponent_revealed) {
+        (true, true) => settle(state, match_id, config),
+        (true, false) => award_forfeit(state, match_id, config, challenger, opponent, stake),
+        (false, true) => award_forfeit(state, match_id, config, opponent, challenger, stake),
+        (false, false) => {
+            if let Some(game_match) = state.matches.get_mut(&match_id) {
+                game_match.state = MatchState::Refunded;
+            }
+            refund(challenger, stake);
+            refund(opponent, stake);
+            vec![GameEvents::MatchRefunded { match_id }]
+        }
+    }
+}
+
+fn award_forfeit(
+    state: &mut GameState,
+    match_id: u64,
+    config: Config,
+    winner: ActorId,
+    loser: ActorId,
+    stake: u128,
+) -> Vec<GameEvents> {
+    let winner_rating = state.record_mut(winner).rating;
+    let loser_rating = state.record_mut(loser).rating;
+    let winner_delta = rating_delta(winner_rating, loser_rating, SCORE_WIN, config.elo_k);
+    let loser_delta = rating_delta(loser_rating, winner_rating, SCORE_LOSS, config.elo_k);
+    apply_pvp_result(state.record_mut(winner), winner_delta, LogicOutcome::Win);
+    apply_pvp_result(state.record_mut(loser), loser_delta, LogicOutcome::Loss);
+    let winner_new = state.record_mut(winner).rating;
+    let loser_new = state.record_mut(loser).rating;
+
+    let capacity = config.leaderboard_capacity as usize;
+    let champ_winner = update_leaderboard(&mut state.leaderboard, winner.into_bytes(), winner_new, capacity);
+    let champ_loser = update_leaderboard(&mut state.leaderboard, loser.into_bytes(), loser_new, capacity);
+
+    let payout = decisive_payout(stake, config.rake_bps);
+    state.pot = state.pot.saturating_add(payout.rake);
+    if let Some(game_match) = state.matches.get_mut(&match_id) {
+        game_match.state = MatchState::Settled;
+    }
+    refund(winner, payout.winner_amount);
+
+    let mut events = vec![GameEvents::MatchForfeited { match_id, winner, loser }];
+    if champ_winner {
+        events.push(GameEvents::NewChampion { player: winner, rating: winner_new });
+    } else if champ_loser {
+        events.push(GameEvents::NewChampion { player: loser, rating: loser_new });
+    }
+    events
+}
+
+fn read_reveal_status(state: &GameState, match_id: u64) -> Option<(ActorId, ActorId, bool, bool, u128)> {
+    let game_match = state.matches.get(&match_id)?;
+    Some((
+        game_match.challenger,
+        game_match.opponent,
+        game_match.challenger_reveal.is_some(),
+        game_match.opponent_reveal.is_some(),
+        game_match.stake_vara,
+    ))
+}
 
 fn read_revealed(state: &GameState, match_id: u64) -> Option<(ActorId, ActorId, LogicMove, LogicMove, u128)> {
     let game_match = state.matches.get(&match_id)?;
