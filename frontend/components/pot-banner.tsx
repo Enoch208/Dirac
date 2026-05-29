@@ -20,7 +20,7 @@ export function PotBanner() {
               {POT.title}
             </h2>
             <p className="mt-6 text-lg leading-relaxed text-muted">{POT.body}</p>
-            <CtaButton href={POT.cta.href} label={POT.cta.label} className="mt-10" />
+            <CtaButton href={POT.cta.href} label={POT.cta.label} beam className="mt-10" />
           </div>
         </div>
       </Reveal>
