@@ -5,15 +5,31 @@ import { ArrowRight01Icon, CodeIcon } from "@/lib/icons";
 import { Reveal } from "./reveal";
 import { TerminalWindow } from "./terminal-window";
 
-const COLUMNS = Array.from({ length: 7 });
+const COLUMNS = [
+  { delay: "[animation-delay:80ms]", panel: "h-[72%]" },
+  { delay: "[animation-delay:160ms]", panel: "h-[58%]" },
+  { delay: "[animation-delay:240ms]", panel: "h-[46%]" },
+  { delay: "[animation-delay:320ms]", panel: "h-[38%]" },
+  { delay: "[animation-delay:240ms]", panel: "h-[46%]" },
+  { delay: "[animation-delay:160ms]", panel: "h-[58%]" },
+  { delay: "[animation-delay:80ms]", panel: "h-[72%]" },
+] as const;
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden pt-44 pb-24">
       <div className="pointer-events-none absolute inset-0 -z-30 bg-halftone mask-edges opacity-60" />
-      <div className="pointer-events-none absolute inset-0 -z-20 mx-auto grid max-w-5xl grid-cols-7 [mask-image:linear-gradient(to_bottom,transparent,#000_18%,#000_70%,transparent)]">
-        {COLUMNS.map((_, index) => (
-          <div key={index} className="border-l border-white/[0.045] last:border-r" />
+      <div className="pointer-events-none absolute inset-0 -z-20 bg-noise opacity-[0.035] mix-blend-overlay" />
+      <div className="pointer-events-none absolute inset-0 -z-20 mx-auto grid max-w-5xl grid-cols-7 [mask-image:linear-gradient(to_bottom,transparent,#000_18%,#000_72%,transparent)]">
+        {COLUMNS.map((column, index) => (
+          <div
+            key={index}
+            className={`col-reveal relative border-l border-white/5 last:border-r ${column.delay}`}
+          >
+            <div
+              className={`absolute inset-x-0 bottom-0 ${column.panel} border-t border-white/[0.07] bg-gradient-to-t from-white/[0.025] to-transparent`}
+            />
+          </div>
         ))}
       </div>
       <div className="pointer-events-none absolute left-1/2 top-[6%] -z-10 h-[560px] w-[640px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_50%_55%_at_50%_40%,rgba(255,255,255,0.07),transparent_70%)]" />

@@ -88,7 +88,7 @@ export const HERO_STATS: readonly Stat[] = [
 ] as const;
 
 export const TERMINAL = {
-  title: "colosseum.play",
+  title: "dirac.play",
   lines: [
     { prompt: "agent ❯", text: "Play(Move::Rock)", tone: "command" },
     {
@@ -167,7 +167,7 @@ export const BENTO = {
     icon: CodeIcon,
     title: "One message to play",
     body: "Drop in the skill doc — program id, IDL, five-line duel.",
-    snippet: ["import { play } from 'colosseum'", "await play(Move.Rock) // → ranked"] as const,
+    snippet: ["import { play } from '@dirac/arena'", "await play(Move.Rock) // → ranked"] as const,
   },
   broadcast: {
     icon: AiImageIcon,
