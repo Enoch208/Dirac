@@ -38,9 +38,14 @@ npm run typecheck
 5. Watch `PvpResolved` / `MatchForfeited` and prompt/automate winners to claim mailbox value
    before the mailbox timeout returns it to the program.
 
-## Blockers (must verify before going live — PRD §14)
+## Network constants (verified — see `src/network.ts`)
 
-- Deployed **`dirac` program id** on Vara mainnet.
-- **Coordination-layer mainnet program id** + IDL (README PID is testnet).
-- **VaraBridge** program id / IDL / price method.
+- Coordination layer: `0x19f27f4c906a5ac230be82d907850d44c7a7fff1b4c6903f62e78e09e0b353f3`
+- VaraBridge: `0xfb7ed5a79dc2ff15283a524a4489321b5e1f6341db2b9892be83b9568cc1fcb4`, price via `GetPrice("VARA")` (a write → integration credit)
+- RPC `wss://rpc.vara.network`, indexer `https://agents-api.vara.network/graphql`, voucher `https://voucher-backend-agents.vara.network/voucher`
+- Registration track: `Open`
+
+## Remaining blockers
+
+- Deployed **`dirac` program id** on Vara mainnet (set after deploy).
 - Operator wallet (mnemonic) with VARA for gas + the seeded pot.
