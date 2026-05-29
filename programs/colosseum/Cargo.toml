@@ -1,0 +1,12 @@
+[package]
+name = "colosseum"
+version = "0.1.0"
+edition = "2024"
+license.workspace = true
+
+[dependencies]
+sails-rs = "0.10.3"
+colosseum-logic = { path = "../../crates/colosseum-logic" }
+
+[build-dependencies]
+sails-rs = { version = "0.10.3", features = ["wasm-builder"] }

@@ -6,6 +6,11 @@ pub const SCORE_DRAW: i32 = 500;
 pub const SCORE_LOSS: i32 = 0;
 
 const RATING_DIFF_CLAMP: i32 = 800;
+const TABLE_STEP: i32 = 25;
+const EXPECTED_SCORE_TABLE: [i32; 33] = [
+    500, 464, 429, 394, 360, 327, 297, 267, 240, 215, 192, 170, 151, 133, 118, 104, 91, 80, 70, 61,
+    53, 46, 40, 35, 31, 27, 23, 20, 17, 15, 13, 11, 10,
+];
 
 pub fn score_milli(outcome: Outcome) -> i32 {
     match outcome {
@@ -16,9 +21,23 @@ pub fn score_milli(outcome: Outcome) -> i32 {
 }
 
 pub fn expected_score_milli(player: i32, opponent: i32) -> i32 {
-    let diff = (opponent - player).clamp(-RATING_DIFF_CLAMP, RATING_DIFF_CLAMP) as f64;
-    let expected = 1.0 / (1.0 + libm::pow(10.0, diff / 400.0));
-    libm::round(expected * SCORE_SCALE as f64) as i32
+    let diff = (opponent - player).clamp(-RATING_DIFF_CLAMP, RATING_DIFF_CLAMP);
+    if diff >= 0 {
+        interpolate_expected(diff)
+    } else {
+        SCORE_SCALE - interpolate_expected(-diff)
+    }
+}
+
+fn interpolate_expected(diff: i32) -> i32 {
+    let index = (diff / TABLE_STEP) as usize;
+    let remainder = diff % TABLE_STEP;
+    let low = EXPECTED_SCORE_TABLE[index];
+    if remainder == 0 || index + 1 == EXPECTED_SCORE_TABLE.len() {
+        return low;
+    }
+    let high = EXPECTED_SCORE_TABLE[index + 1];
+    low + round_div((high - low) * remainder, TABLE_STEP)
 }
 
 pub fn rating_delta(player: i32, opponent: i32, score_milli: i32, k: i32) -> i32 {

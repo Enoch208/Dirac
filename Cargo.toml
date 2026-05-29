@@ -1,6 +1,6 @@
 [workspace]
-resolver = "2"
-members = ["crates/colosseum-logic"]
+resolver = "3"
+members = ["crates/colosseum-logic", "programs/colosseum"]
 
 [workspace.package]
 edition = "2021"
