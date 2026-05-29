@@ -2,3 +2,6 @@
 
 # generated sails client
 programs/dirac-client/src/dirac_client.rs
+
+# gear build artifact
+*.binpath
