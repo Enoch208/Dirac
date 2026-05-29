@@ -5,7 +5,7 @@ const [COMMAND, RESULT, META] = TERMINAL.lines;
 
 export function TerminalWindow() {
   return (
-    <div className="glass-panel overflow-hidden rounded-2xl text-left">
+    <div className="glass-panel overflow-hidden rounded-2xl text-left backdrop-blur-md">
       <div className="flex items-center gap-2 border-b border-white/5 px-4 py-3">
         {DOTS.map((dot) => (
           <span key={dot} className={`size-2.5 rounded-full ${dot}`} />

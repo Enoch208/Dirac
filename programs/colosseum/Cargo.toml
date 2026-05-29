@@ -5,8 +5,15 @@ edition = "2024"
 license.workspace = true
 
 [dependencies]
-sails-rs = "0.10.3"
+sails-rs = "0.10.4"
 colosseum-logic = { path = "../../crates/colosseum-logic" }
 
 [build-dependencies]
-sails-rs = { version = "0.10.3", features = ["wasm-builder"] }
+sails-rs = { version = "0.10.4", features = ["wasm-builder"] }
+
+[dev-dependencies]
+colosseum-client = { path = "../colosseum-client" }
+gtest = "=1.10.0"
+gstd = "=1.10.0"
+sails-rs = { version = "0.10.4", features = ["gtest", "gclient"] }
+tokio = { version = "1.48", features = ["rt", "macros"] }

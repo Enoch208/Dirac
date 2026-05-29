@@ -35,9 +35,19 @@
   to { clip-path: inset(0 0 0% 0); }
 }
 
+@keyframes dots-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(13px, -13px, 0); }
+}
+
 @layer base {
+  :root {
+    color-scheme: dark;
+  }
+
   html {
     scroll-behavior: smooth;
+    background-color: var(--color-background);
   }
 
   body {
@@ -46,6 +56,7 @@
     font-family: var(--font-sans), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    overscroll-behavior: none;
   }
 
   ::selection {
@@ -74,7 +85,7 @@
   .rise-delay-4 { animation-delay: 0.32s; }
 
   .col-reveal {
-    animation: column-reveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    animation: column-reveal 1.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
     will-change: clip-path;
   }
 
@@ -105,14 +116,24 @@
     color: transparent;
   }
 
-  .bg-halftone {
-    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.11) 1px, transparent 1.6px);
-    background-size: 15px 15px;
+  .bg-dots {
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.32) 1.1px, transparent 1.7px);
+    background-size: 13px 13px;
   }
 
-  .mask-edges {
-    -webkit-mask-image: linear-gradient(to right, #000, transparent 38%, transparent 62%, #000);
-    mask-image: linear-gradient(to right, #000, transparent 38%, transparent 62%, #000);
+  .dots-drift {
+    animation: dots-drift 9s linear infinite alternate;
+    will-change: transform;
+  }
+
+  .mask-corner-tl {
+    -webkit-mask-image: radial-gradient(circle at top left, #000 5%, transparent 62%);
+    mask-image: radial-gradient(circle at top left, #000 5%, transparent 62%);
+  }
+
+  .mask-corner-tr {
+    -webkit-mask-image: radial-gradient(circle at top right, #000 5%, transparent 62%);
+    mask-image: radial-gradient(circle at top right, #000 5%, transparent 62%);
   }
 
   .glass-panel {
@@ -121,7 +142,6 @@
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.07),
       0 30px 70px -40px rgba(0, 0, 0, 0.9);
-    backdrop-filter: blur(14px);
   }
 
   .btn-gloss {

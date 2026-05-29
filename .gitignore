@@ -1,1 +1,4 @@
 /target
+
+# generated sails client
+programs/colosseum-client/src/colosseum_client.rs

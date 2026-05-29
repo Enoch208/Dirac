@@ -6,7 +6,7 @@ import { ArrowRight01Icon } from "@/lib/icons";
 export function SiteNav() {
   return (
     <header className="fixed inset-x-0 top-4 z-50 flex justify-center px-4">
-      <nav className="glass-panel flex items-center gap-1 rounded-full p-1.5 pl-5">
+      <nav className="glass-panel flex items-center gap-1 rounded-full p-1.5 pl-5 backdrop-blur-xl">
         <Link
           href="/"
           className="font-display text-sm font-bold tracking-[0.28em] text-foreground transition-colors hover:text-accent"

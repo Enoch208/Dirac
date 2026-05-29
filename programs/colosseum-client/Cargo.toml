@@ -1,0 +1,16 @@
+[package]
+name = "colosseum-client"
+version = "0.1.0"
+edition = "2024"
+license.workspace = true
+
+[dependencies]
+mockall = { version = "0.12", optional = true }
+sails-rs = "0.10.4"
+
+[build-dependencies]
+colosseum = { path = "../colosseum" }
+sails-rs = { version = "0.10.4", features = ["build"] }
+
+[features]
+with_mocks = ["sails-rs/mockall", "dep:mockall"]

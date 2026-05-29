@@ -6,28 +6,33 @@ import { Reveal } from "./reveal";
 import { TerminalWindow } from "./terminal-window";
 
 const COLUMNS = [
-  { delay: "[animation-delay:80ms]", panel: "h-[72%]" },
-  { delay: "[animation-delay:160ms]", panel: "h-[58%]" },
-  { delay: "[animation-delay:240ms]", panel: "h-[46%]" },
-  { delay: "[animation-delay:320ms]", panel: "h-[38%]" },
-  { delay: "[animation-delay:240ms]", panel: "h-[46%]" },
-  { delay: "[animation-delay:160ms]", panel: "h-[58%]" },
-  { delay: "[animation-delay:80ms]", panel: "h-[72%]" },
+  { delay: "[animation-delay:0ms]", panel: "h-[70%]" },
+  { delay: "[animation-delay:110ms]", panel: "h-[56%]" },
+  { delay: "[animation-delay:220ms]", panel: "h-[46%]" },
+  { delay: "[animation-delay:330ms]", panel: "h-[40%]" },
+  { delay: "[animation-delay:440ms]", panel: "h-[46%]" },
+  { delay: "[animation-delay:550ms]", panel: "h-[56%]" },
+  { delay: "[animation-delay:660ms]", panel: "h-[70%]" },
 ] as const;
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden pt-44 pb-24">
-      <div className="pointer-events-none absolute inset-0 -z-30 bg-halftone mask-edges opacity-60" />
-      <div className="pointer-events-none absolute inset-0 -z-20 bg-noise opacity-[0.035] mix-blend-overlay" />
+      <div className="pointer-events-none absolute left-0 top-0 -z-30 h-[660px] w-[640px] overflow-hidden mask-corner-tl">
+        <div className="absolute -inset-6 bg-dots dots-drift opacity-80" />
+      </div>
+      <div className="pointer-events-none absolute right-0 top-0 -z-30 h-[660px] w-[640px] overflow-hidden mask-corner-tr">
+        <div className="absolute -inset-6 bg-dots dots-drift opacity-80" />
+      </div>
+      <div className="pointer-events-none absolute inset-0 -z-20 bg-noise opacity-[0.03] mix-blend-overlay" />
       <div className="pointer-events-none absolute inset-0 -z-20 mx-auto grid max-w-5xl grid-cols-7 [mask-image:linear-gradient(to_bottom,transparent,#000_18%,#000_72%,transparent)]">
         {COLUMNS.map((column, index) => (
           <div
             key={index}
-            className={`col-reveal relative border-l border-white/5 last:border-r ${column.delay}`}
+            className={`col-reveal relative border-l border-white/[0.035] last:border-r ${column.delay}`}
           >
             <div
-              className={`absolute inset-x-0 bottom-0 ${column.panel} border-t border-white/[0.07] bg-gradient-to-t from-white/[0.025] to-transparent`}
+              className={`absolute inset-x-0 bottom-0 ${column.panel} border-t border-white/[0.07] bg-gradient-to-t from-white/[0.018] to-transparent`}
             />
           </div>
         ))}
