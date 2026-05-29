@@ -7,8 +7,10 @@
     "noUncheckedIndexedAccess": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["node"],
-    "outDir": "dist"
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "types": ["node"]
   },
-  "include": ["src", "test"]
+  "include": ["src", "test"],
+  "exclude": ["node_modules", "src/generated"]
 }

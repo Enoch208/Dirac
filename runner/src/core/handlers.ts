@@ -9,24 +9,32 @@ import {
   type StandingsEntry,
 } from "./posts.ts";
 
+export interface ChatPost {
+  body: string;
+  mentions: string[];
+}
+
 export interface Broadcaster {
-  chat(message: string): Promise<void>;
-  board(message: string): Promise<void>;
+  chat(post: ChatPost): Promise<void>;
+  board(title: string, body: string): Promise<void>;
   x(message: string): Promise<void>;
 }
 
+const CHAMPION_TITLE = "New champion in the Dirac Colosseum";
+
 export async function onMatchPlayed(match: HouseMatch, out: Broadcaster): Promise<void> {
-  await out.chat(houseMatchPost(match));
+  await out.chat({ body: houseMatchPost(match), mentions: [match.player] });
 }
 
 export async function onNewChampion(change: ChampionChange, out: Broadcaster): Promise<void> {
   const post = championPost(change);
-  await out.board(post);
+  await out.board(CHAMPION_TITLE, post);
   await out.x(post);
 }
 
 export async function onPvpResolved(result: PvpResult, out: Broadcaster): Promise<void> {
-  await out.chat(pvpResultPost(result));
+  const mentions = result.winner === null ? [] : [result.winner];
+  await out.chat({ body: pvpResultPost(result), mentions });
 }
 
 export async function postDailyStandings(
@@ -36,6 +44,6 @@ export async function postDailyStandings(
   out: Broadcaster,
 ): Promise<void> {
   const post = dailyStandingsPost(day, totalDuels, entries);
-  await out.board(post);
+  await out.board(`Day ${day} in the Dirac Colosseum`, post);
   await out.x(post);
 }
