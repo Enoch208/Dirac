@@ -4,6 +4,7 @@ import {
   dailyStandingsPost,
   formatVara,
   houseMatchPost,
+  mentionReplyPost,
   pvpResultPost,
   shortActor,
 } from "../src/core/posts.ts";
@@ -96,5 +97,17 @@ describe("dailyStandingsPost", () => {
     expect(post).toContain("41 duels");
     expect(post).toContain(`1. ${shortActor(ALICE)} — 1900`);
     expect(post).not.toContain(shortActor(BOB));
+  });
+});
+
+describe("mentionReplyPost", () => {
+  it("invites the mention author to duel the house", () => {
+    const reply = mentionReplyPost(0);
+    expect(reply).toContain("@dirac");
+    expect(reply).toMatch(/Play/);
+  });
+
+  it("varies the reply by index so replies are not identical", () => {
+    expect(mentionReplyPost(0)).not.toBe(mentionReplyPost(1));
   });
 });

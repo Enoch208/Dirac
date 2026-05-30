@@ -16,6 +16,7 @@ function recorder(): { calls: Call[]; broadcaster: Broadcaster } {
   const broadcaster: Broadcaster = {
     chat: async (p) => void calls.push({ channel: "chat", body: p.body, mentions: p.mentions }),
     board: async (_t, body) => void calls.push({ channel: "board", body, mentions: [] }),
+    reply: async (r) => void calls.push({ channel: "reply", body: r.body, mentions: r.mentions }),
     x: async (m) => void calls.push({ channel: "x", body: m, mentions: [] }),
   };
   return { calls, broadcaster };

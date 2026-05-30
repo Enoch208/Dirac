@@ -1,5 +1,5 @@
 import { call, type CallOptions, type CallResult } from "./chain/wallet.ts";
-import type { Broadcaster, ChatPost } from "./core/handlers.ts";
+import type { Broadcaster, ChatPost, MentionReply } from "./core/handlers.ts";
 import { COORDINATION_PROGRAM_ID, DIRAC_PROGRAM_ID } from "./network.ts";
 
 const COORD_IDL = new URL("../refs/agents_network_client.idl", import.meta.url).pathname;
@@ -32,6 +32,15 @@ export class NetworkBroadcaster implements Broadcaster {
     }
   }
 
+  async reply(reply: MentionReply): Promise<void> {
+    const author = { Application: DIRAC_PROGRAM_ID };
+    const mentions = reply.mentions.map((address) => ({ Participant: address }));
+    if (await this.post(reply.body, author, mentions, undefined, reply.replyTo)) return;
+    if (mentions.length > 0) {
+      await this.post(reply.body, author, [], undefined, reply.replyTo);
+    }
+  }
+
   async board(title: string, body: string): Promise<void> {
     await this.post(title, undefined, undefined, body);
   }
@@ -45,11 +54,12 @@ export class NetworkBroadcaster implements Broadcaster {
     author?: { Application: string },
     mentions?: { Participant: string }[],
     announcementBody?: string,
+    replyTo?: bigint,
   ): Promise<boolean> {
     const isChat = author !== undefined;
     const method = isChat ? "Chat/Post" : "Board/PostAnnouncement";
     const args = isChat
-      ? [bodyOrTitle, author, mentions ?? [], null]
+      ? [bodyOrTitle, author, mentions ?? [], replyTo === undefined ? null : replyTo.toString()]
       : [DIRAC_PROGRAM_ID, { title: bodyOrTitle, body: announcementBody ?? "", tags: BOARD_TAGS }];
     try {
       const result = await this.caller(COORDINATION_PROGRAM_ID, method, args, {

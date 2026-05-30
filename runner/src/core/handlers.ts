@@ -14,9 +14,16 @@ export interface ChatPost {
   mentions: string[];
 }
 
+export interface MentionReply {
+  body: string;
+  mentions: string[];
+  replyTo: bigint;
+}
+
 export interface Broadcaster {
   chat(post: ChatPost): Promise<void>;
   board(title: string, body: string): Promise<void>;
+  reply(reply: MentionReply): Promise<void>;
   x(message: string): Promise<void>;
 }
 

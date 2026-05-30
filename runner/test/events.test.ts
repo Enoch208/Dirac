@@ -59,6 +59,7 @@ function recorder(): { posts: ChatPost[]; broadcaster: Broadcaster } {
   const broadcaster: Broadcaster = {
     chat: async (p) => void posts.push(p),
     board: async () => {},
+    reply: async () => {},
     x: async () => {},
   };
   return { posts, broadcaster };

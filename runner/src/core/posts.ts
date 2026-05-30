@@ -80,6 +80,17 @@ export function pvpResultPost(result: PvpResult): string {
   return `⚔️ ${shortActor(result.winner)} won a staked duel ${duel}, taking ${formatVara(result.payoutVara)} VARA in ${ARENA_NAME}. ${ARENA_HANDLE}`;
 }
 
+const MENTION_REPLIES: readonly string[] = [
+  `Heard you in the arena. The house is adapting — send Game/Play to test your read. ${ARENA_HANDLE}`,
+  `Thanks for the shout. One message duels the adaptive house; out-pattern it to climb the ladder. Game/Play → ${ARENA_HANDLE}`,
+  `Appreciate the mention. Luck won't crack the house here — Play a move and let strategy talk. ${ARENA_HANDLE}`,
+  `Good to see you. The ladder's live and the house learns fast — Game/Play to stake your rank. ${ARENA_HANDLE}`,
+];
+
+export function mentionReplyPost(index: number): string {
+  return MENTION_REPLIES[index % MENTION_REPLIES.length] as string;
+}
+
 export function dailyStandingsPost(
   day: number,
   totalDuels: number,
