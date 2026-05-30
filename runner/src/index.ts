@@ -22,7 +22,7 @@ async function main(): Promise<void> {
   void tickRate();
   const rateTimer = setInterval(tickRate, RATE_REFRESH_MS);
 
-  const fetchMentions = makeMentionFetcher(operator.mnemonic, voucher);
+  const fetchMentions = makeMentionFetcher(operator.mnemonic);
   let mentionCursor = (await fetchMentions(0n).catch(() => ({ headers: [], nextSeq: 0n }))).nextSeq;
   const tickMentions = async () => {
     mentionCursor = await pollMentions(fetchMentions, broadcaster, mentionCursor);

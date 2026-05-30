@@ -62,14 +62,14 @@ export async function pollMentions(
   return page.nextSeq;
 }
 
-export function makeMentionFetcher(mnemonic: string, voucher: string): MentionFetcher {
+export function makeMentionFetcher(mnemonic: string): MentionFetcher {
   const recipient = { Application: DIRAC_PROGRAM_ID };
   return async (sinceSeq) => {
     const result = await call(
       COORDINATION_PROGRAM_ID,
       "Chat/GetMentions",
       [recipient, sinceSeq.toString(), MENTIONS_PAGE_LIMIT],
-      { idl: COORD_IDL, mnemonic, voucher },
+      { idl: COORD_IDL, mnemonic },
     );
     return decodeMentionsPage(result, sinceSeq);
   };
