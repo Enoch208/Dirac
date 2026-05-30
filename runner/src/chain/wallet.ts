@@ -35,14 +35,17 @@ export async function call(
   opts: CallOptions,
 ): Promise<CallResult> {
   const cliArgs = [
-    "--network", "mainnet", "--json", "--mnemonic", opts.mnemonic,
+    "--network", "mainnet", "--json",
     "call", programId, method,
     "--args", JSON.stringify(args),
     "--idl", opts.idl,
   ];
   if (opts.voucher) cliArgs.push("--voucher", opts.voucher);
   if (opts.value) cliArgs.push("--value", opts.value);
-  const { stdout } = await execFileAsync(VW, cliArgs, { maxBuffer: MAX_BUFFER });
+  const { stdout } = await execFileAsync(VW, cliArgs, {
+    maxBuffer: MAX_BUFFER,
+    env: { ...process.env, VARA_MNEMONIC: opts.mnemonic },
+  });
   return JSON.parse(lastJsonLine(stdout)) as CallResult;
 }
 
