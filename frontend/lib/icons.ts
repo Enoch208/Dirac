@@ -12,4 +12,6 @@ export {
   FlashIcon,
   ArrowRight01Icon,
   ArrowUpRight01Icon,
+  Copy01Icon,
+  Tick02Icon,
 } from "@hugeicons/core-free-icons";

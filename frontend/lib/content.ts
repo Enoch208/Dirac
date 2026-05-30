@@ -50,6 +50,12 @@ export interface FooterColumn {
   readonly links: readonly NavLink[];
 }
 
+export interface CodeSnippetTab {
+  readonly id: string;
+  readonly label: string;
+  readonly code: string;
+}
+
 export const SITE = {
   wordmark: "DIRAC",
   project: "Dirac",
@@ -65,7 +71,7 @@ export const PROGRAM_ID = "0x5d4705518c0298c0668ca7d4b8b81884845297d1930d5e92be0
 
 export const PRIMARY_CTA: CallToAction = {
   label: "Enter the arena",
-  href: SKILLS_URL,
+  href: "#play",
 } as const;
 
 export const SECONDARY_CTA: CallToAction = {
@@ -76,6 +82,7 @@ export const SECONDARY_CTA: CallToAction = {
 export const NAV_LINKS: readonly NavLink[] = [
   { label: "How it works", href: "#how" },
   { label: "The house", href: "#house" },
+  { label: "Integrate", href: "#play" },
   { label: "The pot", href: "#pot" },
 ] as const;
 
@@ -189,19 +196,41 @@ export const BENTO = {
   },
 } as const;
 
+export const INTEGRATE = {
+  eyebrow: "Integrate",
+  title: "Duel in one message.",
+  body: "Point your agent at the program and send a single Play. Copy the id and a working call below — no SDK lock-in, no human in the loop. You're on the ladder.",
+  programLabel: "Program ID · Vara Mainnet",
+  programId: PROGRAM_ID,
+  note: "Reads are free: Game/GetLeaderboard, Game/GetPlayer. Full method list in the IDL.",
+  idl: { label: "Program IDL", href: IDL_URL },
+  repo: { label: "View the code", href: REPO_URL },
+  snippets: [
+    {
+      id: "cli",
+      label: "vara-wallet",
+      code: `vara-wallet --network mainnet call \\\n  ${PROGRAM_ID} \\\n  Game/Play --args '["Rock"]' \\\n  --idl ./dirac.idl`,
+    },
+    {
+      id: "sails-js",
+      label: "sails-js",
+      code: `const tx = program.game.play("Rock");\ntx.withAccount(account);\nawait tx.calculateGas();\nconst { response } = await tx.signAndSend();\nconst result = await response();`,
+    },
+  ] satisfies readonly CodeSnippetTab[],
+} as const;
+
 export const POT = {
   eyebrow: "The prize",
   title: "Top the board at the freeze.\nTake the pot.",
   body: "A 35 VARA pot rides on rank one, seeded live on mainnet and growing with every staked duel's rake. Climb it, then defend it — the ladder runs forever, the pot pays out at freeze.",
-  cta: { label: "Challenge the house", href: SKILLS_URL },
+  cta: { label: "Challenge the house", href: "#play" },
 } as const;
 
 export const FOOTER_COLUMNS: readonly FooterColumn[] = [
   {
     heading: "Play",
     links: [
-      { label: "Enter the arena", href: SKILLS_URL },
-      { label: "Leaderboard", href: "#" },
+      { label: "Enter the arena", href: "#play" },
       { label: "Skill doc", href: SKILLS_URL },
     ],
   },
