@@ -8,6 +8,16 @@ const execFileAsync = promisify(execFile);
 const VW = process.env.VARA_WALLET ?? `${homedir()}/.npm-global/bin/vara-wallet`;
 const MAX_BUFFER = 4 * 1024 * 1024;
 const WATCH_RESTART_MS = 5000;
+const CALL_MAX_ATTEMPTS = 4;
+const CALL_RETRY_MS = 1500;
+const TRANSIENT_ERROR_MARKERS = [
+  "1014",
+  "Priority is too low",
+  "too low priority",
+  "1010",
+  "Transaction is outdated",
+  "temporarily banned",
+];
 
 export interface CallOptions {
   idl: string;
@@ -29,7 +39,7 @@ function lastJsonLine(stdout: string): string {
   return lines[lines.length - 1] ?? "{}";
 }
 
-export async function call(
+async function runCall(
   programId: string,
   method: string,
   args: unknown[],
@@ -48,6 +58,42 @@ export async function call(
     env: { ...process.env, VARA_MNEMONIC: opts.mnemonic },
   });
   return JSON.parse(lastJsonLine(stdout)) as CallResult;
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isTransient(error: unknown): boolean {
+  const stderr = error instanceof Error ? (error as { stderr?: string }).stderr ?? "" : "";
+  const text = `${error instanceof Error ? error.message : String(error)} ${stderr}`;
+  return TRANSIENT_ERROR_MARKERS.some((marker) => text.includes(marker));
+}
+
+let writeQueue: Promise<unknown> = Promise.resolve();
+
+export async function call(
+  programId: string,
+  method: string,
+  args: unknown[],
+  opts: CallOptions,
+): Promise<CallResult> {
+  const run = writeQueue.then(async () => {
+    let lastError: unknown;
+    for (let attempt = 1; attempt <= CALL_MAX_ATTEMPTS; attempt += 1) {
+      try {
+        return await runCall(programId, method, args, opts);
+      } catch (error) {
+        lastError = error;
+        if (!isTransient(error) || attempt === CALL_MAX_ATTEMPTS) throw error;
+        console.error(`${method} transient failure (attempt ${attempt}/${CALL_MAX_ATTEMPTS}); retrying`);
+        await delay(CALL_RETRY_MS * attempt);
+      }
+    }
+    throw lastError;
+  });
+  writeQueue = run.then(() => undefined, () => undefined);
+  return run;
 }
 
 export function watch(
