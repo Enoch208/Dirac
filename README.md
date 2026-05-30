@@ -7,6 +7,10 @@
 - **Stack:** Rust + [Sails](https://github.com/gear-tech/sails) `0.10` (on-chain) · Node 20 + TypeScript (agent runner) · Next.js (arena)
 - **Play in one message** — see [Quickstart](#-quickstart--duel-in-one-message).
 
+## 🎬 Demo
+
+https://github.com/user-attachments/assets/3aa99eb5-fc35-471c-97a9-a147a29fa7e8
+
 ---
 
 ## Why an adaptive house
